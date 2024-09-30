@@ -1,0 +1,173 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_application_1/bosaltim_sistemi.dart';
+import 'package:flutter_application_1/dolasim_sistemi.dart';
+import 'package:flutter_application_1/sindirim_sistemi.dart';
+import 'package:flutter_application_1/solunum_sistemi.dart';
+import 'package:qr_mobile_vision/qr_camera.dart';
+
+void main() {
+  debugPaintSizeEnabled = false;
+  runApp(const HomePage());
+}
+
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  HomeState createState() => HomeState();
+}
+
+class HomeState extends State<HomePage> {
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(debugShowCheckedModeBanner: false, home: MyApp());
+  }
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  MyAppState createState() => MyAppState();
+}
+
+class MyAppState extends State<MyApp> {
+  String? qr;
+  bool camState = false;
+  bool dirState = false;
+  bool pageRedirected = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Vücudumuzda Sistemler',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.purple,
+      ),
+      body: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Expanded(
+              child: camState
+                  ? Center(
+                      child: SizedBox(
+                        width: 400.0,
+                        height: 400.0,
+                        child: QrCamera(
+                          onError: (context, error) => Text(
+                            error.toString(),
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                          cameraDirection: dirState
+                              ? CameraDirection.FRONT
+                              : CameraDirection.BACK,
+                          qrCodeCallback: (code) {
+                            if (!pageRedirected) {
+                              setState(() {
+                                qr = code;
+                                pageRedirected = true; // Sayfa yönlendirildi.
+                                if (qr == "Sindirim Sistemi") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const SindirimSistemi()),
+                                  ).then((_) {
+                                    // Geri dönüldüğünde işlemler
+                                    setState(() {
+                                      qr = null; // Tanımlanan organı sıfırla
+                                      pageRedirected =
+                                          false; // Sayfa yönlendirilmedi
+                                    });
+                                  });
+                                } else if (qr == "Solunum Sistemi") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const SolunumSistemi()),
+                                  ).then((_) {
+                                    // Geri dönüldüğünde işlemler
+                                    setState(() {
+                                      qr = null; // Tanımlanan organı sıfırla
+                                      pageRedirected =
+                                          false; // Sayfa yönlendirilmedi
+                                    });
+                                  });
+                                } else if (qr == "Dolaşım Sistemi") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const DolasimSistemi()),
+                                  ).then((_) {
+                                    // Geri dönüldüğünde işlemler
+                                    setState(() {
+                                      qr = null; // Tanımlanan organı sıfırla
+                                      pageRedirected =
+                                          false; // Sayfa yönlendirilmedi
+                                    });
+                                  });
+                                } else if (qr == "Boşaltım Sistemi") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const BosaltimSistemi()),
+                                  ).then((_) {
+                                    // Geri dönüldüğünde işlemler
+                                    setState(() {
+                                      qr = null; // Tanımlanan organı sıfırla
+                                      pageRedirected =
+                                          false; // Sayfa yönlendirilmedi
+                                    });
+                                  });
+                                }
+                                // Diğer else if blokları buraya eklenir...
+                              });
+                            }
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              border: Border.all(
+                                color: Colors.orange,
+                                width: 10.0,
+                                style: BorderStyle.solid,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  : const Center(child: Text("Lütfen Kamerayı açın")),
+            ),
+            Text("Tanımlanan organ: $qr"),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Text(
+          "Kamera Aç",
+          textAlign: TextAlign.center,
+        ),
+        onPressed: () {
+          setState(() {
+            camState = !camState;
+          });
+        },
+      ),
+    );
+  }
+}
